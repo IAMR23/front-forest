@@ -1,35 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Nav from './components/Nav';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import Upload from './pages/Upload';
+import Search from './pages/Search';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const isLandlord = localStorage.getItem('role') === 'landlord';
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Nav isLandlord={isLandlord} />
+      <Routes>
+        <Route path="/" element={<h1>Bienvenido a la Inmobiliaria</h1>} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/upload" element={isLandlord ? <Upload /> : <h1>No tienes permiso para ver esta página.</h1>} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
