@@ -1,25 +1,33 @@
-// src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Nav from './components/Nav';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import Upload from './pages/Upload';
-import Search from './pages/Search';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import PropertyDetail from './pages/PropertyDetail';
+import Dashboard from './pages/Dashboard';
+import AdminPanel from './pages/AdminPanel';
+import SearchResults from './pages/SearchResults';
+import LoginForm from './components/LoginForm';
+import RegistrationForm from './components/RegistrationForm';
 
 function App() {
-  const isLandlord = localStorage.getItem('role') === 'landlord';
-
   return (
-    <Router>
-      <Nav isLandlord={isLandlord} />
-      <Routes>
-        <Route path="/" element={<h1>Bienvenido a la Inmobiliaria</h1>} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/upload" element={isLandlord ? <Upload /> : <h1>No tienes permiso para ver esta página.</h1>} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow w-full p-4">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/propiedad/:id" element={<PropertyDetail />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/buscar" element={<SearchResults />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/registro" element={<RegistrationForm />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 

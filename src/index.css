@@ -21,12 +21,14 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* Quitar o modificar estas líneas para que el contenido no se centre */
+  /* display: flex;
+  place-items: center; */
   min-width: 320px;
   min-height: 100vh;
-  background-color: #fbf9f9; /* Fondo blanco */
+  background-color: #fbf9f9;
 }
+
 
 h1 {
   font-size: 3.2em;
@@ -46,7 +48,7 @@ button {
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: #747af8;
 }
 
 button:focus,
