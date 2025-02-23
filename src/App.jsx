@@ -1,13 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import PropertyDetail from './pages/PropertyDetail';
-import Dashboard from './pages/Dashboard';
-import AdminPanel from './pages/AdminPanel';
-import SearchResults from './pages/SearchResults';
-import LoginForm from './components/LoginForm';
-import RegistrationForm from './components/RegistrationForm';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import PropertyDetail from "./pages/PropertyDetail";
+import Dashboard from "./pages/Dashboard";
+import AdminPanel from "./pages/AdminPanel";
+import SearchResults from "./pages/SearchResults";
+import LoginForm from "./components/LoginForm";
+import RegistrationForm from "./components/RegistrationForm";
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
         <Navbar />
         <main className="flex-grow w-full p-4">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/propiedad/:id" element={<PropertyDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
