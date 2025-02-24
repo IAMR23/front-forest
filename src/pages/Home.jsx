@@ -1,64 +1,85 @@
-// src/pages/Home.jsx
-import React, { useEffect, useState } from 'react';
-import Slider from 'react-slick';
-import { getProperties } from '../services/api';
-import PropertyCard from '../components/PropertyCard';
-import SearchBar from '../components/SearchBar';
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
+import React, { useEffect, useState } from "react";
+import { obtenerDepartamentos } from "../services/departamentServices";
 
 function Home() {
-  const [properties, setProperties] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const data = await getProperties();
-        setProperties(data);
-      } catch (error) {
-        console.error("Error al obtener propiedades:", error);
-      }
-    };
-
-    fetchProperties();
-  }, []);
-
-  // Configuración del carrusel
-  const settings = {
-    dots: true, // Muestra puntos de navegación
-    infinite: true, // Reproduce en bucle
-    speed: 500,
-    slidesToShow: 3, // Número de propiedades visibles
-    slidesToScroll: 1,
-    autoplay: true, // Reproducción automática
-    autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: 2 },
-      },
-      {
-        breakpoint: 600,
-        settings: { slidesToShow: 1 },
-      },
-    ],
+  const fetchDepartamentos = async () => {
+    try {
+      const data = await obtenerDepartamentos();
+      setDepartamentos(data);
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
+  useEffect(() => {
+    fetchDepartamentos();
+  }, []);
+
   return (
-    <div className="container mx-auto">
-      <SearchBar />
-      <h1 className="text-3xl font-bold mb-4 text-center">Propiedades Disponibles</h1>
-      
-      {properties.length === 0 ? (
-        <p className="text-center">No hay propiedades disponibles.</p>
-      ) : (
-        <Slider {...settings}>
-          {properties.map(property => (
-            <div key={property._id} className="p-4">
-              <PropertyCard property={property} />
+    <div className="p-6 bg-gray-100 min-h-screen">
+      {error && <p className="text-red-500">{error}</p>}
+      {departamentos.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {departamentos.map((departamento) => (
+            <div
+              key={departamento._id}
+              className="bg-white rounded-lg shadow-md overflow-hidden"
+            >
+              {/* Imágenes */}
+              <div className="flex overflow-x-auto p-2">
+                {departamento.fotos.map((foto, index) => (
+                  <img
+                    key={index}
+                    src={foto}
+                    alt={`Foto ${index + 1} de ${departamento.titulo}`}
+                    className="w-32 h-32 object-cover rounded-lg mr-2"
+                  />
+                ))}
+              </div>
+
+              {/* Contenido de la card */}
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2">
+                  {departamento.titulo}
+                </h3>
+                <p className="text-gray-600 mb-2">{departamento.descripcion}</p>
+                <p className="text-gray-700 font-bold mb-2">
+                  ${departamento.precio}
+                </p>
+                <p className="text-gray-600 mb-2">
+                  <strong>Ubicación:</strong> {departamento.ubicacion}
+                </p>
+                <p className="text-gray-600 mb-2">
+                  <strong>Habitaciones:</strong> {departamento.habitaciones}
+                </p>
+                <p className="text-gray-600 mb-2">
+                  <strong>Características:</strong>
+                </p>
+                <ul className="list-disc list-inside mb-2">
+                  {departamento.caracteristicas.map((caracteristica, index) => (
+                    <li key={index} className="text-gray-600">
+                      {caracteristica}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-gray-600 mb-2">
+                  <strong>Condiciones:</strong> {departamento.condiciones}
+                </p>
+                <p className="text-gray-600 mb-2">
+                  <strong>Fecha de Publicación:</strong>{" "}
+                  {new Date(departamento.fechaPublicacion).toLocaleDateString()}
+                </p>
+              </div>
             </div>
           ))}
-        </Slider>
+        </div>
+      ) : (
+        <p className="text-gray-600">
+          Por el momento no se encuentran departamentos publicados.
+        </p>
       )}
     </div>
   );

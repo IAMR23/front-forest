@@ -86,3 +86,21 @@ export async function obtenerDepartamentosPorVerificar() {
     throw new Error("Error al obtener los departamentos");
   }
 }
+
+export async function obtenerDepartamentos() {
+  try {
+    const response = await axios.get(`/departamentos`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error al decodificar el token o al hacer la solicitud:",
+      error
+    );
+    console.log(error);
+    throw new Error("Error al obtener los departamentos");
+  }
+}

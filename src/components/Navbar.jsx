@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
     <nav className="bg-blue-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">
+        <Link to="/home" className="text-xl font-bold">
           ESPE Alojamiento
         </Link>
         <div className="space-x-4">
-          <Link to="/">Inicio</Link>
+          <Link to="/home">Inicio</Link>
           <Link to="/buscar">Buscar</Link>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/admin">Admin</Link>
