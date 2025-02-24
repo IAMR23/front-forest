@@ -11,6 +11,8 @@ import RegistrationForm from "./components/RegistrationForm";
 import DepartamentoForm from "./components/DepartamentoForm";
 import MisDepartamentos from "./components/MisDepartamentos";
 import DetallesDepartamento from "./components/DetallesDepartamento";
+import GestionarCuentas from "./pages/GestionarCuentas";
+import GestionarDepartamentos from "./pages/GestionarDepartamentos";
 
 function App() {
   return (
@@ -31,6 +33,11 @@ function App() {
             <Route
               path="/misdepartamentos/:id"
               element={<DetallesDepartamento />}
+            />
+            <Route path="/gestionar-cuentas" element={<GestionarCuentas />} />
+            <Route
+              path="/gestionar-departamentos"
+              element={<GestionarDepartamentos />}
             />
           </Routes>
         </main>

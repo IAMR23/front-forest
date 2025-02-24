@@ -66,3 +66,23 @@ export const updateDepartament = async (id, departamentoData) => {
     throw error;
   }
 };
+
+/* Admin */
+
+export async function obtenerDepartamentosPorVerificar() {
+  try {
+    const response = await axios.get(`/departamentos/verificacion`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error al decodificar el token o al hacer la solicitud:",
+      error
+    );
+    console.log(error);
+    throw new Error("Error al obtener los departamentos");
+  }
+}
