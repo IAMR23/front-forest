@@ -8,6 +8,9 @@ import AdminPanel from "./pages/AdminPanel";
 import SearchResults from "./pages/SearchResults";
 import LoginForm from "./components/LoginForm";
 import RegistrationForm from "./components/RegistrationForm";
+import DepartamentoForm from "./components/DepartamentoForm";
+import MisDepartamentos from "./components/MisDepartamentos";
+import DetallesDepartamento from "./components/DetallesDepartamento";
 
 function App() {
   return (
@@ -23,6 +26,12 @@ function App() {
             <Route path="/buscar" element={<SearchResults />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/registro" element={<RegistrationForm />} />
+            <Route path="/crear/departamento" element={<DepartamentoForm />} />
+            <Route path="/misdepartamentos" element={<MisDepartamentos />} />
+            <Route
+              path="/misdepartamentos/:id"
+              element={<DetallesDepartamento />}
+            />
           </Routes>
         </main>
         <Footer />
