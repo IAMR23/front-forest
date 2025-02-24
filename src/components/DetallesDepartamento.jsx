@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { obtenerDepartamento } from "../services/departamentServices";
+import {
+  obtenerDepartamento,
+  updateDepartament,
+} from "../services/departamentServices";
 
 function DetallesDepartamento() {
   const { id } = useParams();
@@ -64,7 +67,7 @@ function DetallesDepartamento() {
         formDataToSend.append("fotos", file);
       });
 
-      await createDepartamento(formDataToSend);
+      await updateDepartament(id, formDataToSend);
 
       setFormData({
         titulo: "",
@@ -78,10 +81,11 @@ function DetallesDepartamento() {
       setFotos([]);
     } catch (error) {
       setError(
-        error.response?.data?.message || "Error al registrar el departamento."
+        error.response?.data?.message || "Error al registrar el departamento.",
+        console.log(error)
       );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 

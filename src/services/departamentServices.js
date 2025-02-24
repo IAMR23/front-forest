@@ -47,3 +47,22 @@ export async function obtenerDepartamento(id) {
     throw new Error("Error al obtener los departamentos");
   }
 }
+
+export const updateDepartament = async (id, departamentoData) => {
+  try {
+    console.log(id);
+    const response = await axios.patch(
+      `/actualizarDep/${id}`,
+      departamentoData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al crear el departamento:", error);
+    throw error;
+  }
+};
