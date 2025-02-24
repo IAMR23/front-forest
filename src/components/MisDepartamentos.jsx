@@ -5,7 +5,7 @@ import { obtenerDepartamentosPorArrendador } from "../services/departamentServic
 function MisDepartamentos() {
   const [departamentos, setDepartamentos] = useState([]);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Hook para redirigir
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDepartamentos = async () => {
@@ -16,19 +16,34 @@ function MisDepartamentos() {
         setError(error.message);
       }
     };
-
     fetchDepartamentos();
   }, []);
 
-  // Función para manejar el clic en el botón
+  // Navegar a los detalles del departamento
   const handleVerDetalles = (id) => {
-    navigate(`/misdepartamentos/${id}`); // Redirige a la página de detalles
+    navigate(`/misdepartamentos/${id}`);
+  };
+
+  // Navegar al formulario para crear un nuevo departamento
+  const handleCrearDepartamento = () => {
+    navigate("/crear/departamento");
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {error && <p className="text-red-500">{error}</p>}
-      <h2 className="text-2xl font-bold mb-6">Mis Departamentos</h2>
+
+      {/* Encabezado */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Mis Departamentos</h2>
+        <button
+          onClick={handleCrearDepartamento}
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+        >
+          Crear Departamento
+        </button>
+      </div>
+
       {departamentos.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {departamentos.map((departamento) => (
@@ -48,7 +63,7 @@ function MisDepartamentos() {
                 ))}
               </div>
 
-              {/* Contenido de la card */}
+              {/* Información del departamento */}
               <div className="p-4">
                 <h3 className="text-xl font-semibold mb-2">
                   {departamento.titulo}
@@ -83,27 +98,26 @@ function MisDepartamentos() {
                 <p className="text-gray-600 mb-2">
                   <strong>Aprobado:</strong>{" "}
                   <span
-                    className={`font-semibold ${
-                      departamento.aprobado ? "text-green-500" : "text-red-500"
-                    }`}
+                    className={`font-semibold ${departamento.aprobado ? "text-green-500" : "text-red-500"
+                      }`}
                   >
                     {departamento.aprobado ? "Sí" : "No"}
                   </span>
                 </p>
+                {/* Mostrar disponibilidad actualizada */}
                 <p className="text-gray-600 mb-4">
                   <strong>Disponible:</strong>{" "}
                   <span
                     className={`font-semibold ${
-                      departamento.disponible
+                      departamento.disponibilidad === "Sí" || departamento.disponibilidad === false
                         ? "text-green-500"
                         : "text-red-500"
-                    }`}
+                      }`}
                   >
-                    {departamento.disponible ? "Sí" : "No"}
+                    {departamento.disponibilidad === "Sí" || departamento.disponibilidad === true ? "Sí" : "No"}
                   </span>
                 </p>
 
-                {/* Botón para ver detalles */}
                 <button
                   onClick={() => handleVerDetalles(departamento._id)}
                   className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"

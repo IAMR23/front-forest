@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createDepartamento } from "../services/departamentServices";
 
 function DepartamentoForm() {
@@ -11,11 +12,11 @@ function DepartamentoForm() {
     caracteristicas: "Muchas, cosas, interesantes",
     condiciones: "",
   });
-
   const [fotos, setFotos] = useState([]); // Guardar archivos
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +46,7 @@ function DepartamentoForm() {
       await createDepartamento(formDataToSend);
       setSuccess("Departamento registrado exitosamente.");
 
+      // Opcional: Reiniciar campos del formulario
       setFormData({
         titulo: "",
         descripcion: "",
@@ -55,6 +57,9 @@ function DepartamentoForm() {
         condiciones: "",
       });
       setFotos([]);
+
+      // Redirigir al dashboard una vez registrado el departamento
+      navigate("/dashboard");
     } catch (error) {
       setError(
         error.response?.data?.message || "Error al registrar el departamento."

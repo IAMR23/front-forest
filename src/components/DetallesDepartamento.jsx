@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import {
-  obtenerDepartamento,
-  updateDepartament,
-} from "../services/departamentServices";
+import { useParams, useNavigate } from "react-router-dom";
+import { obtenerDepartamento, updateDepartament } from "../services/departamentServices";
 
 function DetallesDepartamento() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
@@ -15,6 +13,7 @@ function DetallesDepartamento() {
     habitaciones: "",
     caracteristicas: "",
     condiciones: "",
+    disponibilidad: ""
   });
   const [fotos, setFotos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,13 +30,14 @@ function DetallesDepartamento() {
             precio: dept.precio,
             ubicacion: dept.ubicacion,
             habitaciones: dept.habitaciones,
-            caracteristicas: dept.caracteristicas.join(", "), // Se asume que es un array
+            caracteristicas: dept.caracteristicas.join(", "),
             condiciones: dept.condiciones,
+            disponibilidad: dept.disponibilidad // Valor "Sí" o "No"
           });
           setFotos(dept.fotos || []);
           setIsLoading(false);
         })
-        .catch((e) => {
+        .catch(() => {
           setError("Error al cargar los detalles del departamento");
           setIsLoading(false);
         });
@@ -46,6 +46,10 @@ function DetallesDepartamento() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Se asegura que solo se acepten "Sí" o "No" para disponibilidad
+    if (name === "disponibilidad" && value !== "Sí" && value !== "No" && value !== "") {
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -56,33 +60,20 @@ function DetallesDepartamento() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
     try {
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
       });
-
       fotos.forEach((file) => {
         formDataToSend.append("fotos", file);
       });
-
       await updateDepartament(id, formDataToSend);
-
-      setFormData({
-        titulo: "",
-        descripcion: "",
-        precio: "",
-        ubicacion: "",
-        habitaciones: "",
-        caracteristicas: "",
-        condiciones: "",
-      });
-      setFotos([]);
+      // Redirige al dashboard tras la actualización exitosa
+      navigate("/dashboard");
     } catch (error) {
       setError(
-        error.response?.data?.message || "Error al registrar el departamento.",
-        console.log(error)
+        error.response?.data?.message || "Error al actualizar el departamento."
       );
     } finally {
       setIsLoading(false);
@@ -92,7 +83,6 @@ function DetallesDepartamento() {
   if (isLoading) {
     return <p>Cargando...</p>;
   }
-
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
@@ -100,8 +90,8 @@ function DetallesDepartamento() {
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded shadow-md">
       <h2 className="text-2xl font-bold mb-4">Detalles del Departamento</h2>
-
       <form onSubmit={handleSubmit}>
+        {/* Campo Título */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Título</label>
           <input
@@ -113,7 +103,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Descripción */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Descripción</label>
           <textarea
@@ -124,7 +114,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Precio */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Precio</label>
           <input
@@ -136,7 +126,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Ubicación */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Ubicación</label>
           <input
@@ -148,11 +138,9 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Habitaciones */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">
-            Número de Habitaciones
-          </label>
+          <label className="block mb-1 text-gray-700">Número de Habitaciones</label>
           <input
             type="number"
             name="habitaciones"
@@ -162,7 +150,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Características */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Características</label>
           <input
@@ -174,7 +162,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Condiciones */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Condiciones</label>
           <textarea
@@ -185,7 +173,22 @@ function DetallesDepartamento() {
             required
           />
         </div>
-
+        {/* Campo Disponibilidad */}
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-700">Disponibilidad</label>
+          <select
+            name="disponibilidad"
+            value={formData.disponibilidad}
+            onChange={handleChange}
+            className="w-full border rounded p-2 bg-white text-gray-900"
+            required
+          >
+            <option value="">Seleccione...</option>
+            <option value="Sí">Sí</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        {/* Campo Subir Fotos */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Subir Fotos (JPG)</label>
           <input
@@ -196,7 +199,6 @@ function DetallesDepartamento() {
             className="w-full border rounded p-2 bg-white text-gray-900"
           />
         </div>
-
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded w-full"

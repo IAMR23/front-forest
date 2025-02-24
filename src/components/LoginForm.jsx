@@ -24,7 +24,7 @@ function LoginForm() {
     try {
       const response = await loginUser(credentials);
       localStorage.setItem("token", response.token); // Guardar token en localStorage
-      navigate("/crear/departamento"); // Redirigir al usuario
+      navigate("/dashboard"); // Redirigir al usuario
     } catch (error) {
       setError(error.response?.data?.message || "Error al iniciar sesión.");
     } finally {
