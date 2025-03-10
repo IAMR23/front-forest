@@ -74,7 +74,7 @@ export const updateDepartament = async (id, departamentoData) => {
 
 export async function obtenerDepartamentosPorVerificar() {
   try {
-    const response = await axios.get(`/departamentos/verificacion`, {
+    const response = await axios.get(`/departamentos-verificacion`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

@@ -43,7 +43,7 @@ function GestionarCuentas() {
     try {
       const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
       const response = await fetch(
-        `http://localhost:5000/aprobar-arrendador/${id}`,
+        `http://localhost:5000/aprobar/arrendador/${id}`,
         {
           method: "PUT",
           headers: {
@@ -70,7 +70,7 @@ function GestionarCuentas() {
     try {
       const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
       const response = await fetch(
-        `http://localhost:5000/desactivar-arrendador/${id}`,
+        `http://localhost:5000/desactivar/arrendador/${id}`,
         {
           method: "PUT",
           headers: {
