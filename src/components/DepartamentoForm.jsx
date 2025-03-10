@@ -12,20 +12,42 @@ function DepartamentoForm() {
     condiciones: "",
   });
 
-  const [fotos, setFotos] = useState([]); // Guardar archivos
+  const [fotos, setFotos] = useState([]); // Archivos de imágenes
+  const [previewUrls, setPreviewUrls] = useState([]); // URLs de vista previa
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  // Manejar cambios en los inputs de texto
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Manejar la selección de imágenes
   const handleFileChange = (e) => {
-    setFotos([...e.target.files]); // Guardar los archivos seleccionados
+    const files = Array.from(e.target.files);
+
+    if (files.length + fotos.length > 3) {
+      setError("Solo puedes subir un máximo de 3 imágenes.");
+      return;
+    }
+
+    setFotos((prevFotos) => [...prevFotos, ...files]);
+    setPreviewUrls((prevUrls) => [
+      ...prevUrls,
+      ...files.map((file) => URL.createObjectURL(file)),
+    ]);
+    setError(null);
   };
 
+  // Eliminar una imagen seleccionada
+  const handleRemoveImage = (index) => {
+    setFotos((prevFotos) => prevFotos.filter((_, i) => i !== index));
+    setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
+  };
+
+  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -44,7 +66,6 @@ function DepartamentoForm() {
 
       await createDepartamento(formDataToSend);
       setSuccess("Departamento registrado exitosamente.");
-
       setFormData({
         titulo: "",
         descripcion: "",
@@ -55,6 +76,7 @@ function DepartamentoForm() {
         condiciones: "",
       });
       setFotos([]);
+      setPreviewUrls([]);
     } catch (error) {
       setError(
         error.response?.data?.message || "Error al registrar el departamento."
@@ -157,8 +179,9 @@ function DepartamentoForm() {
           />
         </div>
 
+        {/* Input de archivos */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Subir Fotos (JPG)</label>
+          <label className="block mb-1 text-gray-700">Subir Fotos (Máx: 3 JPG)</label>
           <input
             type="file"
             accept="image/jpeg"
@@ -167,6 +190,31 @@ function DepartamentoForm() {
             className="w-full border rounded p-2 bg-white text-gray-900"
           />
         </div>
+
+        {/* Vista previa de imágenes */}
+        {previewUrls.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold">Vista previa:</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {previewUrls.map((url, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={url}
+                    alt={`Vista previa ${index + 1}`}
+                    className="w-24 h-24 object-cover rounded border"
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full text-xs"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <button
           type="submit"

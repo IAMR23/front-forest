@@ -136,9 +136,8 @@ function MisDepartamentos() {
                 <p className="text-gray-600 mb-2">
                   <strong>Aprobado:</strong>{" "}
                   <span
-                    className={`font-semibold ${
-                      departamento.aprobado ? "text-green-500" : "text-red-500"
-                    }`}
+                    className={`font-semibold ${departamento.aprobado ? "text-green-500" : "text-red-500"
+                      }`}
                   >
                     {departamento.aprobado ? "Sí" : "No"}
                   </span>
@@ -148,11 +147,10 @@ function MisDepartamentos() {
                 <p className="text-gray-600 mb-4">
                   <strong>Disponible:</strong>{" "}
                   <span
-                    className={`font-semibold ${
-                      departamento.disponible === "Sí"
+                    className={`font-semibold ${departamento.disponible === "Sí"
                         ? "text-green-500"
                         : "text-red-500"
-                    }`}
+                      }`}
                   >
                     {departamento.disponible}
                   </span>
