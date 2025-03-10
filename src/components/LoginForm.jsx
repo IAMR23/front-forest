@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/userServices";
-function LoginForm() {
+import { jwtDecode } from "jwt-decode";
+
+function LoginForm({ setAuth }) {  // 🔹 Recibe setAuth para actualizar el estado global de autenticación
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -23,8 +25,14 @@ function LoginForm() {
 
     try {
       const response = await loginUser(credentials);
-      localStorage.setItem("token", response.token); // Guardar token en localStorage
-      navigate("/dashboard"); // Redirigir al usuario
+      localStorage.setItem("token", response.token); // 🔹 Guardar token en localStorage
+
+      const decodedToken = jwtDecode(response.token);
+      localStorage.setItem("role", decodedToken.role); // 🔹 Guardar rol del usuario en localStorage
+
+      setAuth({ isAuthenticated: true, role: decodedToken.role }); // 🔹 Actualizar estado global de autenticación
+
+      navigate("/dashboard"); // 🔹 Redirigir al usuario
     } catch (error) {
       setError(error.response?.data?.message || "Error al iniciar sesión.");
     } finally {
