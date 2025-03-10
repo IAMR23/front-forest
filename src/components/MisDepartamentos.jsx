@@ -21,7 +21,7 @@ function MisDepartamentos() {
         console.error("Error al decodificar el token", error);
       }
     }
-  }, []); // 👈 Se ejecuta solo una vez al montar el componente
+  }, []); // Se ejecuta solo una vez al montar el componente
 
   // Obtener los departamentos cuando user tenga un valor válido
   useEffect(() => {
@@ -29,14 +29,21 @@ function MisDepartamentos() {
       if (!user) return; // Evitar llamadas con user null
       try {
         const data = await obtenerDepartamentosPorArrendador(user);
-        setDepartamentos(data);
+
+        // Normalizar los datos para evitar problemas con disponibilidad
+        const departamentosConDisponibilidad = data.map((dept) => ({
+          ...dept,
+          disponible: dept.disponible ? "Sí" : "No", // Convertimos booleano a string para UI
+        }));
+
+        setDepartamentos(departamentosConDisponibilidad);
       } catch (error) {
-        setError(error.message);
+        setError(error.message || "Error al obtener los departamentos.");
       }
     };
 
     fetchDepartamentos();
-  }, [user]); // 👈 Se ejecuta cuando user cambia
+  }, [user]); // Se ejecuta cuando user cambia
 
   // Navegar a los detalles del departamento
   const handleVerDetalles = (id) => {
@@ -48,7 +55,7 @@ function MisDepartamentos() {
     navigate("/crear/departamento");
   };
 
-  console.log("CP2", departamentos);
+  console.log("Departamentos:", departamentos); // Debugging
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -74,14 +81,18 @@ function MisDepartamentos() {
             >
               {/* Imágenes */}
               <div className="flex overflow-x-auto p-2">
-                {departamento.fotos.map((foto, index) => (
-                  <img
-                    key={index}
-                    src={foto}
-                    alt={`Foto ${index + 1} de ${departamento.titulo}`}
-                    className="w-32 h-32 object-cover rounded-lg mr-2"
-                  />
-                ))}
+                {departamento.fotos && departamento.fotos.length > 0 ? (
+                  departamento.fotos.map((foto, index) => (
+                    <img
+                      key={index}
+                      src={foto}
+                      alt={`Foto ${index + 1} de ${departamento.titulo}`}
+                      className="w-32 h-32 object-cover rounded-lg mr-2"
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500">Sin imágenes</p>
+                )}
               </div>
 
               {/* Información del departamento */}
@@ -103,18 +114,24 @@ function MisDepartamentos() {
                   <strong>Características:</strong>
                 </p>
                 <ul className="list-disc list-inside mb-2">
-                  {departamento.caracteristicas.map((caracteristica, index) => (
-                    <li key={index} className="text-gray-600">
-                      {caracteristica}
-                    </li>
-                  ))}
+                  {departamento.caracteristicas && departamento.caracteristicas.length > 0 ? (
+                    departamento.caracteristicas.map((caracteristica, index) => (
+                      <li key={index} className="text-gray-600">
+                        {caracteristica}
+                      </li>
+                    ))
+                  ) : (
+                    <p className="text-gray-500">Sin características</p>
+                  )}
                 </ul>
                 <p className="text-gray-600 mb-2">
                   <strong>Condiciones:</strong> {departamento.condiciones}
                 </p>
                 <p className="text-gray-600 mb-2">
                   <strong>Fecha de Publicación:</strong>{" "}
-                  {new Date(departamento.fechaPublicacion).toLocaleDateString()}
+                  {departamento.fechaPublicacion
+                    ? new Date(departamento.fechaPublicacion).toLocaleDateString()
+                    : "No disponible"}
                 </p>
                 <p className="text-gray-600 mb-2">
                   <strong>Aprobado:</strong>{" "}
@@ -126,21 +143,18 @@ function MisDepartamentos() {
                     {departamento.aprobado ? "Sí" : "No"}
                   </span>
                 </p>
+
                 {/* Mostrar disponibilidad actualizada */}
                 <p className="text-gray-600 mb-4">
                   <strong>Disponible:</strong>{" "}
                   <span
                     className={`font-semibold ${
-                      departamento.disponibilidad === "Sí" ||
-                      departamento.disponibilidad === false
+                      departamento.disponible === "Sí"
                         ? "text-green-500"
                         : "text-red-500"
                     }`}
                   >
-                    {departamento.disponibilidad === "Sí" ||
-                    departamento.disponibilidad === true
-                      ? "Sí"
-                      : "No"}
+                    {departamento.disponible}
                   </span>
                 </p>
 

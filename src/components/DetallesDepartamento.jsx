@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  obtenerDepartamento,
-  updateDepartament,
-} from "../services/departamentServices";
+import { obtenerDepartamento, updateDepartament } from "../services/departamentServices";
 
 function DetallesDepartamento() {
   const { id } = useParams();
@@ -16,8 +13,9 @@ function DetallesDepartamento() {
     habitaciones: "",
     caracteristicas: "",
     condiciones: "",
-    disponibilidad: "",
+    disponibilidad: false, // Cambiado a booleano para coincidir con el backend
   });
+
   const [fotos, setFotos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,6 +25,8 @@ function DetallesDepartamento() {
       obtenerDepartamento(id)
         .then((response) => {
           const dept = response.data;
+          console.log("Datos del backend:", dept); // 🔍 Depuración
+
           setFormData({
             titulo: dept.titulo,
             descripcion: dept.descripcion,
@@ -35,31 +35,26 @@ function DetallesDepartamento() {
             habitaciones: dept.habitaciones,
             caracteristicas: dept.caracteristicas.join(", "),
             condiciones: dept.condiciones,
-            disponibilidad: dept.disponibilidad, // Valor "Sí" o "No"
+            disponibilidad: dept.disponible || false, // Asegurar booleano
           });
+
           setFotos(dept.fotos || []);
           setIsLoading(false);
         })
         .catch(() => {
           setError("Error al cargar los detalles del departamento");
           setIsLoading(false);
-          console.log();
         });
     }
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Se asegura que solo se acepten "Sí" o "No" para disponibilidad
-    if (
-      name === "disponibilidad" &&
-      value !== "Sí" &&
-      value !== "No" &&
-      value !== ""
-    ) {
-      return;
-    }
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "disponibilidad" ? value === "Sí" : value, // Conversión a booleano
+    }));
   };
 
   const handleFileChange = (e) => {
@@ -71,19 +66,23 @@ function DetallesDepartamento() {
     setError(null);
     try {
       const formDataToSend = new FormData();
+
       Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
+        if (key === "disponibilidad") {
+          formDataToSend.append("disponible", value); // Enviar booleano real
+        } else {
+          formDataToSend.append(key, value);
+        }
       });
+
       fotos.forEach((file) => {
         formDataToSend.append("fotos", file);
       });
+
       await updateDepartament(id, formDataToSend);
-      // Redirige al dashboard tras la actualización exitosa
       navigate("/dashboard");
     } catch (error) {
-      setError(
-        error.response?.data?.message || "Error al actualizar el departamento."
-      );
+      setError(error.response?.data?.message || "Error al actualizar el departamento.");
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +91,7 @@ function DetallesDepartamento() {
   if (isLoading) {
     return <p>Cargando...</p>;
   }
+
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
@@ -112,6 +112,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Descripción */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Descripción</label>
@@ -123,6 +124,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Precio */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Precio</label>
@@ -135,6 +137,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Ubicación */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Ubicación</label>
@@ -147,11 +150,10 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Habitaciones */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">
-            Número de Habitaciones
-          </label>
+          <label className="block mb-1 text-gray-700">Número de Habitaciones</label>
           <input
             type="number"
             name="habitaciones"
@@ -161,6 +163,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Características */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Características</label>
@@ -173,6 +176,7 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Condiciones */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Condiciones</label>
@@ -184,21 +188,22 @@ function DetallesDepartamento() {
             required
           />
         </div>
+
         {/* Campo Disponibilidad */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Disponibilidad</label>
           <select
             name="disponibilidad"
-            value={formData.disponibilidad}
+            value={formData.disponibilidad ? "Sí" : "No"}
             onChange={handleChange}
             className="w-full border rounded p-2 bg-white text-gray-900"
             required
           >
-            <option value="">Seleccione...</option>
             <option value="Sí">Sí</option>
             <option value="No">No</option>
           </select>
         </div>
+
         {/* Campo Subir Fotos */}
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Subir Fotos (JPG)</label>
@@ -210,6 +215,7 @@ function DetallesDepartamento() {
             className="w-full border rounded p-2 bg-white text-gray-900"
           />
         </div>
+
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded w-full"
