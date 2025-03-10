@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/userServices";
 import { jwtDecode } from "jwt-decode";
 
-function LoginForm({ setAuth }) {  // 🔹 Recibe setAuth para actualizar el estado global de autenticación
+function LoginForm({ setAuth }) {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -25,14 +25,22 @@ function LoginForm({ setAuth }) {  // 🔹 Recibe setAuth para actualizar el est
 
     try {
       const response = await loginUser(credentials);
-      localStorage.setItem("token", response.token); // 🔹 Guardar token en localStorage
+      localStorage.setItem("token", response.token);
 
       const decodedToken = jwtDecode(response.token);
-      localStorage.setItem("role", decodedToken.role); // 🔹 Guardar rol del usuario en localStorage
+      const userRole = decodedToken.role; // 🔹 Extrae el rol del token
 
-      setAuth({ isAuthenticated: true, role: decodedToken.role }); // 🔹 Actualizar estado global de autenticación
+      localStorage.setItem("role", userRole);
+      setAuth({ isAuthenticated: true, role: userRole });
 
-      navigate("/dashboard"); // 🔹 Redirigir al usuario
+      // 🔹 Redirigir según el rol
+      if (userRole === "arrendador") {
+        navigate("/dashboard");
+      } else if (userRole === "arrendatario") {
+        navigate("/home");
+      } else {
+        navigate("/"); // 🔹 En caso de rol no identificado, redirigir a inicio
+      }
     } catch (error) {
       setError(error.response?.data?.message || "Error al iniciar sesión.");
     } finally {

@@ -92,7 +92,7 @@ export async function obtenerDepartamentosPorVerificar() {
 
 export async function obtenerDepartamentos() {
   try {
-    const response = await axios.get(`/departamentos`, {
+    const response = await axios.get(`/departamentos-disponibles`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
