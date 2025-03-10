@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { obtenerDepartamento, updateDepartament } from "../services/departamentServices";
+import {
+  obtenerDepartamento,
+  updateDepartament,
+} from "../services/departamentServices";
 
 function DetallesDepartamento() {
   const { id } = useParams();
@@ -13,7 +16,7 @@ function DetallesDepartamento() {
     habitaciones: "",
     caracteristicas: "",
     condiciones: "",
-    disponibilidad: ""
+    disponibilidad: "",
   });
   const [fotos, setFotos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +35,7 @@ function DetallesDepartamento() {
             habitaciones: dept.habitaciones,
             caracteristicas: dept.caracteristicas.join(", "),
             condiciones: dept.condiciones,
-            disponibilidad: dept.disponibilidad // Valor "Sí" o "No"
+            disponibilidad: dept.disponibilidad, // Valor "Sí" o "No"
           });
           setFotos(dept.fotos || []);
           setIsLoading(false);
@@ -40,6 +43,7 @@ function DetallesDepartamento() {
         .catch(() => {
           setError("Error al cargar los detalles del departamento");
           setIsLoading(false);
+          console.log();
         });
     }
   }, [id]);
@@ -47,7 +51,12 @@ function DetallesDepartamento() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     // Se asegura que solo se acepten "Sí" o "No" para disponibilidad
-    if (name === "disponibilidad" && value !== "Sí" && value !== "No" && value !== "") {
+    if (
+      name === "disponibilidad" &&
+      value !== "Sí" &&
+      value !== "No" &&
+      value !== ""
+    ) {
       return;
     }
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -140,7 +149,9 @@ function DetallesDepartamento() {
         </div>
         {/* Campo Habitaciones */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Número de Habitaciones</label>
+          <label className="block mb-1 text-gray-700">
+            Número de Habitaciones
+          </label>
           <input
             type="number"
             name="habitaciones"

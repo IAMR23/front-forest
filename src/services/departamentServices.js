@@ -34,11 +34,13 @@ export async function obtenerDepartamentosPorArrendador(userId) {
 
 export async function obtenerDepartamento(id) {
   try {
-    const response = await axios.get(`/api/departamentos/${id}`, {
+    const response = await axios.get(`/departamentos/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+    console.log(response);
+
     return response;
   } catch (error) {
     console.error(
@@ -53,7 +55,7 @@ export const updateDepartament = async (id, departamentoData) => {
   try {
     console.log(id);
     const response = await axios.patch(
-      `/actualizarDep/${id}`,
+      `/departamento/${id}`,
       departamentoData,
       {
         headers: {

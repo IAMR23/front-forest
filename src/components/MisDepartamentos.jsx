@@ -48,6 +48,8 @@ function MisDepartamentos() {
     navigate("/crear/departamento");
   };
 
+  console.log("CP2", departamentos);
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {error && <p className="text-red-500">{error}</p>}
