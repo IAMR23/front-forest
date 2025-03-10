@@ -1,23 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { obtenerDepartamentosPorArrendador } from "../services/departamentServices";
+import { jwtDecode } from "jwt-decode";
 
 function MisDepartamentos() {
   const [departamentos, setDepartamentos] = useState([]);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  // Obtener el userId del token una sola vez al montar el componente
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUser(decodedToken.userId); // Asegúrate de que 'userId' es correcto en el payload
+        console.log("Usuario ID:", decodedToken.userId);
+      } catch (error) {
+        console.error("Error al decodificar el token", error);
+      }
+    }
+  }, []); // 👈 Se ejecuta solo una vez al montar el componente
+
+  // Obtener los departamentos cuando user tenga un valor válido
   useEffect(() => {
     const fetchDepartamentos = async () => {
+      if (!user) return; // Evitar llamadas con user null
       try {
-        const data = await obtenerDepartamentosPorArrendador();
+        const data = await obtenerDepartamentosPorArrendador(user);
         setDepartamentos(data);
       } catch (error) {
         setError(error.message);
       }
     };
+
     fetchDepartamentos();
-  }, []);
+  }, [user]); // 👈 Se ejecuta cuando user cambia
 
   // Navegar a los detalles del departamento
   const handleVerDetalles = (id) => {
@@ -98,8 +117,9 @@ function MisDepartamentos() {
                 <p className="text-gray-600 mb-2">
                   <strong>Aprobado:</strong>{" "}
                   <span
-                    className={`font-semibold ${departamento.aprobado ? "text-green-500" : "text-red-500"
-                      }`}
+                    className={`font-semibold ${
+                      departamento.aprobado ? "text-green-500" : "text-red-500"
+                    }`}
                   >
                     {departamento.aprobado ? "Sí" : "No"}
                   </span>
@@ -109,12 +129,16 @@ function MisDepartamentos() {
                   <strong>Disponible:</strong>{" "}
                   <span
                     className={`font-semibold ${
-                      departamento.disponibilidad === "Sí" || departamento.disponibilidad === false
+                      departamento.disponibilidad === "Sí" ||
+                      departamento.disponibilidad === false
                         ? "text-green-500"
                         : "text-red-500"
-                      }`}
+                    }`}
                   >
-                    {departamento.disponibilidad === "Sí" || departamento.disponibilidad === true ? "Sí" : "No"}
+                    {departamento.disponibilidad === "Sí" ||
+                    departamento.disponibilidad === true
+                      ? "Sí"
+                      : "No"}
                   </span>
                 </p>
 
