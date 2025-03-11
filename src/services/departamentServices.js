@@ -5,6 +5,7 @@ export const createDepartamento = async (departamentoData) => {
     const response = await axios.post("/departamento", departamentoData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "multipart/form-data", // Asegurar que se envíe como formulario con archivos
       },
     });
     return response.data;
@@ -53,22 +54,22 @@ export async function obtenerDepartamento(id) {
 
 export const updateDepartament = async (id, departamentoData) => {
   try {
-    console.log(id);
-    const response = await axios.patch(
-      `/departamento/${id}`,
-      departamentoData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    console.log("Actualizando departamento con ID:", id);
+    
+    const response = await axios.patch(`/departamento/${id}`, departamentoData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "multipart/form-data", // Asegurar envío de archivos
+      },
+    });
+    
     return response.data;
   } catch (error) {
-    console.error("Error al crear el departamento:", error);
+    console.error("Error al actualizar el departamento:", error);
     throw error;
   }
 };
+
 
 /* Admin */
 

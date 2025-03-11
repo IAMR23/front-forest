@@ -85,7 +85,7 @@ function MisDepartamentos() {
                   departamento.fotos.map((foto, index) => (
                     <img
                       key={index}
-                      src={foto}
+                      src={foto} // Usamos la URL completa
                       alt={`Foto ${index + 1} de ${departamento.titulo}`}
                       className="w-32 h-32 object-cover rounded-lg mr-2"
                     />
@@ -148,8 +148,8 @@ function MisDepartamentos() {
                   <strong>Disponible:</strong>{" "}
                   <span
                     className={`font-semibold ${departamento.disponible === "Sí"
-                        ? "text-green-500"
-                        : "text-red-500"
+                      ? "text-green-500"
+                      : "text-red-500"
                       }`}
                   >
                     {departamento.disponible}

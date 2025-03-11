@@ -53,19 +53,24 @@ function DepartamentoForm() {
     setLoading(true);
     setError(null);
     setSuccess(null);
-
+  
     try {
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
       });
-
+  
+      // Agregar las imágenes al FormData
       fotos.forEach((file) => {
         formDataToSend.append("fotos", file);
       });
-
+  
+      // Enviar al backend
       await createDepartamento(formDataToSend);
+  
       setSuccess("Departamento registrado exitosamente.");
+      
+      // Resetear el formulario después del éxito
       setFormData({
         titulo: "",
         descripcion: "",
@@ -85,6 +90,7 @@ function DepartamentoForm() {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded shadow-md">
