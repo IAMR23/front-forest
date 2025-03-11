@@ -39,7 +39,7 @@ function LoginForm({ setAuth }) {
       } else if (userRole === "arrendatario") {
         navigate("/home");
       } else {
-        navigate("/"); // 🔹 En caso de rol no identificado, redirigir a inicio
+        navigate("/admin"); // 🔹 En caso de rol no identificado, redirigir a inicio
       }
     } catch (error) {
       setError(error.response?.data?.message || "Error al iniciar sesión.");
