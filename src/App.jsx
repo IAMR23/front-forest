@@ -16,6 +16,7 @@ import MisDepartamentos from "./components/MisDepartamentos";
 import DetallesDepartamento from "./components/DetallesDepartamento";
 import GestionarCuentas from "./pages/GestionarCuentas";
 import GestionarDepartamentos from "./pages/GestionarDepartamentos";
+import DepartamentoCard from "./components/DepartamentoCard";
 
 function App() {
   // 🔹 Estado global de autenticación
@@ -53,9 +54,16 @@ function App() {
             <Route path="/registro" element={<RegistrationForm />} />
             <Route path="/crear/departamento" element={<DepartamentoForm />} />
             <Route path="/misdepartamentos" element={<MisDepartamentos />} />
-            <Route path="/misdepartamentos/:id" element={<DetallesDepartamento />} />
+            <Route
+              path="/misdepartamentos/:id"
+              element={<DetallesDepartamento />}
+            />
             <Route path="/gestionar-cuentas" element={<GestionarCuentas />} />
-            <Route path="/gestionar-departamentos" element={<GestionarDepartamentos />} />
+            <Route
+              path="/gestionar-departamentos"
+              element={<GestionarDepartamentos />}
+            />
+            <Route path="/verdepartamento/:id" element={<DepartamentoCard />} />
           </Routes>
         </main>
         <Footer />

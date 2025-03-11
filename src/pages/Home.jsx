@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { obtenerDepartamentos } from "../services/departamentServices";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [departamentos, setDepartamentos] = useState([]);
@@ -13,6 +14,8 @@ function Home() {
     ubicacion: searchParams.get("ubicacion") || "",
     habitaciones: searchParams.get("habitaciones") || "",
   };
+
+  const navigate = useNavigate();
 
   const fetchDepartamentos = async () => {
     try {
@@ -43,18 +46,23 @@ function Home() {
     return (
       (filtros.precioMax === "" ||
         departamento.precio <= Number(filtros.precioMax)) &&
-      (filtros.ubicacion === "" || 
-        departamento.ubicacion.toLowerCase().includes(filtros.ubicacion.toLowerCase())) &&
+      (filtros.ubicacion === "" ||
+        departamento.ubicacion
+          .toLowerCase()
+          .includes(filtros.ubicacion.toLowerCase())) &&
       (filtros.habitaciones === "" ||
         departamento.habitaciones === Number(filtros.habitaciones))
     );
   });
 
+  const handleVerDetalles = (id) => {
+    navigate(`/verdepartamento/${id}`);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar - Filtros */}
       <aside className="w-64 bg-blue-200 p-6 shadow-md">
-        
         <div className="flex flex-col gap-4">
           <label className="font-medium">Precio máximo:</label>
           <input
@@ -112,7 +120,9 @@ function Home() {
                   <h3 className="text-xl font-semibold mb-2">
                     {departamento.titulo}
                   </h3>
-                  <p className="text-gray-600 mb-2">{departamento.descripcion}</p>
+                  <p className="text-gray-600 mb-2">
+                    {departamento.descripcion}
+                  </p>
                   <p className="text-gray-700 font-bold mb-2">
                     ${departamento.precio}
                   </p>
@@ -126,19 +136,30 @@ function Home() {
                     <strong>Características:</strong>
                   </p>
                   <ul className="list-disc list-inside mb-2">
-                    {departamento.caracteristicas.map((caracteristica, index) => (
-                      <li key={index} className="text-gray-600">
-                        {caracteristica}
-                      </li>
-                    ))}
+                    {departamento.caracteristicas.map(
+                      (caracteristica, index) => (
+                        <li key={index} className="text-gray-600">
+                          {caracteristica}
+                        </li>
+                      )
+                    )}
                   </ul>
                   <p className="text-gray-600 mb-2">
                     <strong>Condiciones:</strong> {departamento.condiciones}
                   </p>
                   <p className="text-gray-600 mb-2">
                     <strong>Fecha de Publicación:</strong>{" "}
-                    {new Date(departamento.fechaPublicacion).toLocaleDateString()}
+                    {new Date(
+                      departamento.fechaPublicacion
+                    ).toLocaleDateString()}
                   </p>
+
+                  <button
+                    onClick={() => handleVerDetalles(departamento._id)}
+                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
+                  >
+                    Ver Detalles
+                  </button>
                 </div>
               </div>
             ))}
