@@ -7,13 +7,13 @@ function GestionarCuentas() {
 
   const fetchArrendadoresPendientes = async () => {
     try {
-      const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
+      const token = localStorage.getItem("token");
       const response = await fetch(
         "http://localhost:5000/arrendadores/verificacion",
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado si es necesario
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -24,134 +24,120 @@ function GestionarCuentas() {
       }
 
       const data = await response.json();
-      setArrendadoresPendientes(data); // Almacena los datos en el estado
+      setArrendadoresPendientes(data);
     } catch (err) {
-      setError(err.message); // Maneja errores
+      setError(err.message);
     } finally {
-      setLoading(false); // Indica que la carga ha terminado
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Función para obtener los arrendadores pendientes
-
     fetchArrendadoresPendientes();
   }, []);
 
-  // Función para manejar la aprobación de un arrendador
   const handleAprobar = async (id) => {
     try {
-      const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
-      const response = await fetch(
-        `http://localhost:5000/aprobar/arrendador/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado si es necesario
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const token = localStorage.getItem("token");
+      await fetch(`http://localhost:5000/aprobar/arrendador/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error("Error al obtener los arrendadores pendientes");
-      }
-
-      const data = await response.json();
-      setArrendadoresPendientes(data); // Almacena los datos en el estado
       fetchArrendadoresPendientes();
     } catch (err) {
-      setError(err.message); // Maneja errores
+      setError(err.message);
     }
   };
 
-  // Función para manejar el rechazo de un arrendador
   const handleRechazar = async (id) => {
     try {
-      const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
-      const response = await fetch(
-        `http://localhost:5000/desactivar/arrendador/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado si es necesario
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const token = localStorage.getItem("token");
+      await fetch(`http://localhost:5000/desactivar/arrendador/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error("Error al obtener los arrendadores pendientes");
-      }
-
-      const data = await response.json();
-      setArrendadoresPendientes(data); // Almacena los datos en el estado
       fetchArrendadoresPendientes();
     } catch (err) {
-      setError(err.message); // Maneja errores
+      setError(err.message);
     }
   };
 
   if (loading) {
-    return <p>Cargando arrendadores pendientes...</p>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-blue-500 text-lg font-semibold">Cargando arrendadores pendientes...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return (
+      <div className="text-center text-red-500 text-lg font-semibold">
+        Error: {error}
+      </div>
+    );
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">Gestionar Cuentas</h1>
-      <h2 className="text-2xl font-semibold mt-6 mb-4">
+    <div className="p-8 bg-white rounded-xl shadow-lg">
+      <h1 className="text-3xl font-bold text-[#D813F2] mb-6 text-center">Gestionar Cuentas</h1>
+
+      <h2 className="text-2xl font-semibold text-[#9D1DF2] mb-4 text-center">
         Arrendadores Pendientes
       </h2>
+
       {arrendadoresPendientes.length > 0 ? (
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="py-2 px-4 border-b">Nombre</th>
-              <th className="py-2 px-4 border-b">Email</th>
-              <th className="py-2 px-4 border-b">Verificado</th>
-              <th className="py-2 px-4 border-b">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {arrendadoresPendientes.map((arrendador) => (
-              <tr key={arrendador.id} className="hover:bg-gray-50">
-                <td className="py-2 px-4 border-b text-center">
-                  {arrendador.nombre}
-                </td>
-                <td className="py-2 px-4 border-b text-center">
-                  {arrendador.email}
-                </td>
-                <td className="py-2 px-4 border-b text-center">
-                  {arrendador.verificado ? (
-                    <span className="text-green-600">Sí</span>
-                  ) : (
-                    <span className="text-red-600">No</span>
-                  )}
-                </td>
-                <td className="py-2 px-4 border-b text-center">
-                  <button
-                    onClick={() => handleAprobar(arrendador._id)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-green-600"
-                  >
-                    Aprobar
-                  </button>
-                  <button
-                    onClick={() => handleRechazar(arrendador._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                  >
-                    Rechazar
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="py-3 px-6 border-b text-left">Nombre</th>
+                <th className="py-3 px-6 border-b text-left">Email</th>
+                <th className="py-3 px-6 border-b text-left">Verificado</th>
+                <th className="py-3 px-6 border-b text-center">Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {arrendadoresPendientes.map((arrendador, index) => (
+                <tr key={arrendador._id} className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100`}>
+                  <td className="py-3 px-6 border-b">{arrendador.nombre}</td>
+                  <td className="py-3 px-6 border-b">{arrendador.email}</td>
+                  <td className="py-3 px-6 border-b">
+                    {arrendador.verificado ? (
+                      <span className="text-green-500 font-semibold">Sí</span>
+                    ) : (
+                      <span className="text-red-500 font-semibold">No</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-6 border-b flex justify-center gap-4">
+                    <button
+                      onClick={() => handleAprobar(arrendador._id)}
+                      className="bg-[#D813F2] text-white px-4 py-2 rounded-lg hover:bg-[#9D1DF2] transition duration-300"
+                    >
+                      Aprobar
+                    </button>
+                    <button
+                      onClick={() => handleRechazar(arrendador._id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+                    >
+                      Rechazar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p>No hay arrendadores pendientes.</p>
+        <p className="text-center text-gray-600 mt-4">No hay arrendadores pendientes.</p>
       )}
     </div>
   );

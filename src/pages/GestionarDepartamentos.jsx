@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { obtenerDepartamentosPorVerificar } from "../services/departamentServices";
 
 function GestionarDepartamentos() {
@@ -19,90 +18,73 @@ function GestionarDepartamentos() {
     fetchDepartamentos();
   }, []);
 
-  // Función para manejar la aprobación de un arrendador
   const handleAprobar = async (id) => {
     try {
-      const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
-      const response = await fetch(
-        `http://localhost:5000/aprobar/departamento/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado si es necesario
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al obtener los arrendadores pendientes");
-      }
-
-      const data = await response.json();
-      setDepartamentos(data); // Almacena los datos en el estado
+      const token = localStorage.getItem("token");
+      await fetch(`http://localhost:5000/aprobar/departamento/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       fetchDepartamentos();
     } catch (err) {
-      setError(err.message); // Maneja errores
+      setError(err.message);
     }
   };
 
-  // Función para manejar el rechazo de un arrendador
   const handleRechazar = async (id) => {
     try {
-      const token = localStorage.getItem("token"); // Obtén el token de autenticación si es necesario
-      const response = await fetch(
-        `http://localhost:5000/desaprobar/departamento/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado si es necesario
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al obtener los arrendadores pendientes");
-      }
-
-      const data = await response.json();
-      setDepartamentos(data); // Almacena los datos en el estado
+      const token = localStorage.getItem("token");
+      await fetch(`http://localhost:5000/desaprobar/departamento/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       fetchDepartamentos();
     } catch (err) {
-      setError(err.message); // Maneja errores
+      setError(err.message);
     }
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      {error && <p className="text-red-500">{error}</p>}
-      <h2 className="text-2xl font-bold mb-6">Mis Departamentos</h2>
+    <div className="p-8 bg-white min-h-screen">
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+      <h2 className="text-3xl font-bold text-[#D813F2] mb-6 text-center">
+        Gestionar Departamentos
+      </h2>
+
       {departamentos.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {departamentos.map((departamento) => (
             <div
               key={departamento._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
+              className="bg-white rounded-xl shadow-lg overflow-hidden"
             >
-              {/* Imágenes */}
-              <div className="flex overflow-x-auto p-2">
-                {departamento.fotos.map((foto, index) => (
+              {/* Imagen principal centrada y más grande */}
+              <div className="flex justify-center items-center overflow-hidden h-64 bg-gray-200">
+                {departamento.fotos && departamento.fotos.length > 0 ? (
                   <img
-                    key={index}
-                    src={foto}
-                    alt={`Foto ${index + 1} de ${departamento.titulo}`}
-                    className="w-32 h-32 object-cover rounded-lg mr-2"
+                    src={departamento.fotos[0]}
+                    alt={`Foto de ${departamento.titulo}`}
+                    className="w-full h-full object-cover"
                   />
-                ))}
+                ) : (
+                  <p className="text-gray-500">Sin imágenes</p>
+                )}
               </div>
 
-              {/* Contenido de la card */}
-              <div className="p-4">
-                <h3 className="text-xl font-semibold mb-2">
+              {/* Información del departamento */}
+              <div className="p-6">
+                <h3 className="text-2xl font-semibold text-[#7F6DF2] mb-2">
                   {departamento.titulo}
                 </h3>
-                <p className="text-gray-600 mb-2">{departamento.descripcion}</p>
-                <p className="text-gray-700 font-bold mb-2">
+                <p className="text-gray-600 mb-4">{departamento.descripcion}</p>
+                <p className="text-[#D813F2] text-xl font-bold mb-4">
                   ${departamento.precio}
                 </p>
                 <p className="text-gray-600 mb-2">
@@ -112,21 +94,13 @@ function GestionarDepartamentos() {
                   <strong>Habitaciones:</strong> {departamento.habitaciones}
                 </p>
                 <p className="text-gray-600 mb-2">
-                  <strong>Características:</strong>
-                </p>
-                <ul className="list-disc list-inside mb-2">
-                  {departamento.caracteristicas.map((caracteristica, index) => (
-                    <li key={index} className="text-gray-600">
-                      {caracteristica}
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-gray-600 mb-2">
                   <strong>Condiciones:</strong> {departamento.condiciones}
                 </p>
                 <p className="text-gray-600 mb-2">
                   <strong>Fecha de Publicación:</strong>{" "}
-                  {new Date(departamento.fechaPublicacion).toLocaleDateString()}
+                  {departamento.fechaPublicacion
+                    ? new Date(departamento.fechaPublicacion).toLocaleDateString()
+                    : "No disponible"}
                 </p>
                 <p className="text-gray-600 mb-2">
                   <strong>Aprobado:</strong>{" "}
@@ -138,6 +112,7 @@ function GestionarDepartamentos() {
                     {departamento.aprobado ? "Sí" : "No"}
                   </span>
                 </p>
+
                 <p className="text-gray-600 mb-4">
                   <strong>Disponible:</strong>{" "}
                   <span
@@ -151,25 +126,29 @@ function GestionarDepartamentos() {
                   </span>
                 </p>
 
-                {/* Botón para ver detalles */}
-                <button
-                  onClick={() => handleAprobar(departamento._id)}
-                  className="bg-green-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-green-600"
-                >
-                  Aprobar
-                </button>
-                <button
-                  onClick={() => handleRechazar(departamento._id)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                >
-                  Rechazar
-                </button>
+                {/* Botones de Aprobar y Rechazar */}
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => handleAprobar(departamento._id)}
+                    className="bg-[#D813F2] text-white px-4 py-2 rounded-lg hover:bg-[#9D1DF2] transition duration-300"
+                  >
+                    Aprobar
+                  </button>
+                  <button
+                    onClick={() => handleRechazar(departamento._id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+                  >
+                    Rechazar
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-gray-600">No tienes departamentos publicados.</p>
+        <p className="text-center text-gray-600 mt-4">
+          No hay departamentos pendientes de aprobación.
+        </p>
       )}
     </div>
   );

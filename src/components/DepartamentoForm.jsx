@@ -3,28 +3,26 @@ import { createDepartamento } from "../services/departamentServices";
 
 function DepartamentoForm() {
   const [formData, setFormData] = useState({
-    titulo: "Prueba",
-    descripcion: "Prueba",
-    precio: "120",
-    ubicacion: "Quito",
-    habitaciones: "3",
-    caracteristicas: "Muchas, cosas, interesantes",
+    titulo: "",
+    descripcion: "",
+    precio: "",
+    ubicacion: "",
+    habitaciones: "",
+    caracteristicas: "",
     condiciones: "",
   });
 
-  const [fotos, setFotos] = useState([]); // Archivos de imágenes
-  const [previewUrls, setPreviewUrls] = useState([]); // URLs de vista previa
+  const [fotos, setFotos] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Manejar cambios en los inputs de texto
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Manejar la selección de imágenes
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
 
@@ -41,36 +39,30 @@ function DepartamentoForm() {
     setError(null);
   };
 
-  // Eliminar una imagen seleccionada
   const handleRemoveImage = (index) => {
     setFotos((prevFotos) => prevFotos.filter((_, i) => i !== index));
     setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
   };
 
-  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
-  
+
     try {
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
       });
-  
-      // Agregar las imágenes al FormData
+
       fotos.forEach((file) => {
         formDataToSend.append("fotos", file);
       });
-  
-      // Enviar al backend
+
       await createDepartamento(formDataToSend);
-  
       setSuccess("Departamento registrado exitosamente.");
-      
-      // Resetear el formulario después del éxito
+
       setFormData({
         titulo: "",
         descripcion: "",
@@ -90,128 +82,84 @@ function DepartamentoForm() {
       setLoading(false);
     }
   };
-  
 
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 rounded shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Registrar Departamento</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      {success && <p className="text-green-500">{success}</p>}
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-[#D813F2] mb-6 text-center">Registrar Departamento</h2>
+      
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+      {success && <p className="text-green-500 text-center mb-4">{success}</p>}
 
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Título</label>
-          <input
-            type="text"
-            name="titulo"
-            value={formData.titulo}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
+        {[
+          { label: "Título", name: "titulo", type: "text" },
+          { label: "Descripción", name: "descripcion", type: "textarea" },
+          { label: "Precio", name: "precio", type: "number" },
+          { label: "Ubicación", name: "ubicacion", type: "text" },
+          { label: "Número de Habitaciones", name: "habitaciones", type: "number" },
+          { label: "Características (separadas por coma)", name: "caracteristicas", type: "text" },
+        ].map(({ label, name, type }) => (
+          <div key={name} className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">{label}</label>
+            {type === "textarea" ? (
+              <textarea
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
+                required
+              />
+            ) : (
+              <input
+                type={type}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
+                required
+              />
+            )}
+          </div>
+        ))}
 
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Descripción</label>
-          <textarea
-            name="descripcion"
-            value={formData.descripcion}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Precio</label>
-          <input
-            type="number"
-            name="precio"
-            value={formData.precio}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Ubicación</label>
-          <input
-            type="text"
-            name="ubicacion"
-            value={formData.ubicacion}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">
-            Número de Habitaciones
-          </label>
-          <input
-            type="number"
-            name="habitaciones"
-            value={formData.habitaciones}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">
-            Características (separadas por coma)
-          </label>
-          <input
-            type="text"
-            name="caracteristicas"
-            value={formData.caracteristicas}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Condiciones</label>
+          <label className="block text-gray-700 font-medium mb-1">Condiciones</label>
           <textarea
             name="condiciones"
             value={formData.condiciones}
             onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
+            className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
             required
           />
         </div>
 
         {/* Input de archivos */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Subir Fotos (Máx: 3 JPG)</label>
+          <label className="block text-gray-700 font-medium mb-1">Subir Fotos (Máx: 3 JPG)</label>
           <input
             type="file"
             accept="image/jpeg"
             multiple
             onChange={handleFileChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
+            className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
           />
         </div>
 
         {/* Vista previa de imágenes */}
         {previewUrls.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Vista previa:</h3>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-[#383673]">Vista previa:</h3>
+            <div className="flex justify-center gap-4 mt-2">
               {previewUrls.map((url, index) => (
                 <div key={index} className="relative">
                   <img
                     src={url}
                     alt={`Vista previa ${index + 1}`}
-                    className="w-24 h-24 object-cover rounded border"
+                    className="w-40 h-40 object-cover rounded-lg shadow-md"
                   />
                   <button
                     type="button"
-                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full text-xs"
+                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full text-xs hover:bg-red-700 transition"
                     onClick={() => handleRemoveImage(index)}
                   >
                     X
@@ -224,7 +172,7 @@ function DepartamentoForm() {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+          className="w-full bg-[#D813F2] text-white py-3 px-6 rounded-lg hover:bg-[#9D1DF2] transition duration-300 text-lg font-semibold"
           disabled={loading}
         >
           {loading ? "Registrando..." : "Registrar"}

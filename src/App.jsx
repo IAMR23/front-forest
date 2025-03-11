@@ -8,7 +8,6 @@ import Home from "./pages/Home";
 import PropertyDetail from "./pages/PropertyDetail";
 import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
-import SearchResults from "./pages/SearchResults";
 import LoginForm from "./components/LoginForm";
 import RegistrationForm from "./components/RegistrationForm";
 import DepartamentoForm from "./components/DepartamentoForm";
@@ -48,7 +47,6 @@ function App() {
             <Route path="/propiedad/:id" element={<PropertyDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/buscar" element={<SearchResults />} />
             {/* 🔹 Pasamos setAuth a LoginForm para actualizar estado tras login */}
             <Route path="/login" element={<LoginForm setAuth={setAuth} />} />
             <Route path="/registro" element={<RegistrationForm />} />

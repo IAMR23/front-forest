@@ -5,7 +5,7 @@ import { obtenerDepartamento, updateDepartament } from "../services/departamentS
 function DetallesDepartamento() {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
@@ -17,19 +17,16 @@ function DetallesDepartamento() {
     disponibilidad: false,
   });
 
-  const [fotos, setFotos] = useState([]); // Fotos existentes
-  const [nuevasFotos, setNuevasFotos] = useState([]); // Nuevas fotos a subir
+  const [fotos, setFotos] = useState([]); 
+  const [nuevasFotos, setNuevasFotos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Obtener detalles del departamento al cargar el componente
   useEffect(() => {
     if (id) {
       obtenerDepartamento(id)
         .then((response) => {
           const dept = response.data;
-          console.log("Datos del backend:", dept); // 🔍 Depuración
-
           setFormData({
             titulo: dept.titulo,
             descripcion: dept.descripcion,
@@ -41,7 +38,6 @@ function DetallesDepartamento() {
             disponibilidad: dept.disponible || false,
           });
 
-          // Guardar las URLs de las imágenes en el estado
           setFotos(dept.fotos || []);
           setIsLoading(false);
         })
@@ -52,51 +48,39 @@ function DetallesDepartamento() {
     }
   }, [id]);
 
-  // Manejar cambios en los inputs de texto
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "disponibilidad" ? value === "Sí" : value, // Convertir disponibilidad a booleano
+      [name]: name === "disponibilidad" ? value === "Sí" : value,
     }));
   };
 
-  // Manejar selección de nuevas imágenes
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setNuevasFotos(files);
   };
 
-  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-  
+
     try {
       const formDataToSend = new FormData();
-  
+
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "disponibilidad") {
-          formDataToSend.append("disponible", value);
-        } else {
-          formDataToSend.append(key, value);
-        }
+        formDataToSend.append(key === "disponibilidad" ? "disponible" : key, value);
       });
-  
-      // Incluir imágenes nuevas solo si hay
+
       if (nuevasFotos.length > 0) {
         nuevasFotos.forEach((file) => {
           formDataToSend.append("fotos", file);
         });
       }
-  
+
       const updatedDepartamento = await updateDepartament(id, formDataToSend);
-      
-      // Actualizar la vista con las nuevas fotos del backend
       setFotos(updatedDepartamento.fotos);
-      
       navigate("/dashboard");
     } catch (error) {
       setError(error.response?.data?.message || "Error al actualizar el departamento.");
@@ -104,96 +88,54 @@ function DetallesDepartamento() {
       setIsLoading(false);
     }
   };
+
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 rounded shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Detalles del Departamento</h2>
-      
+    <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-[#D813F2] mb-6 text-center">Detalles del Departamento</h2>
+
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
       <form onSubmit={handleSubmit}>
-        {/* Campo Título */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Título</label>
-          <input
-            type="text"
-            name="titulo"
-            value={formData.titulo}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
+        {/* Campos del formulario */}
+        {[
+          { label: "Título", name: "titulo", type: "text" },
+          { label: "Descripción", name: "descripcion", type: "textarea" },
+          { label: "Precio", name: "precio", type: "number" },
+          { label: "Ubicación", name: "ubicacion", type: "text" },
+          { label: "Número de Habitaciones", name: "habitaciones", type: "number" },
+          { label: "Características", name: "caracteristicas", type: "text" },
+        ].map(({ label, name, type }) => (
+          <div key={name} className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">{label}</label>
+            {type === "textarea" ? (
+              <textarea
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
+                required
+              />
+            ) : (
+              <input
+                type={type}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
+                required
+              />
+            )}
+          </div>
+        ))}
 
-        {/* Campo Descripción */}
+        {/* Disponibilidad */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Descripción</label>
-          <textarea
-            name="descripcion"
-            value={formData.descripcion}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        {/* Campo Precio */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Precio</label>
-          <input
-            type="number"
-            name="precio"
-            value={formData.precio}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        {/* Campo Ubicación */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Ubicación</label>
-          <input
-            type="text"
-            name="ubicacion"
-            value={formData.ubicacion}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        {/* Campo Habitaciones */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Número de Habitaciones</label>
-          <input
-            type="number"
-            name="habitaciones"
-            value={formData.habitaciones}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        {/* Campo Características */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Características</label>
-          <input
-            type="text"
-            name="caracteristicas"
-            value={formData.caracteristicas}
-            onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
-            required
-          />
-        </div>
-
-        {/* Campo Disponibilidad */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Disponibilidad</label>
+          <label className="block text-gray-700 font-medium mb-1">Disponibilidad</label>
           <select
             name="disponibilidad"
             value={formData.disponibilidad ? "Sí" : "No"}
             onChange={handleChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
+            className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
             required
           >
             <option value="Sí">Sí</option>
@@ -201,13 +143,13 @@ function DetallesDepartamento() {
           </select>
         </div>
 
-        {/* Vista previa de imágenes existentes */}
+        {/* Vista previa de imágenes */}
         {fotos.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Imágenes Actuales:</h3>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-[#383673]">Imágenes Actuales:</h3>
+            <div className="flex justify-center gap-4 mt-2">
               {fotos.map((foto, index) => (
-                <img key={index} src={foto} alt={`Foto ${index + 1}`} className="w-24 h-24 object-cover rounded border" />
+                <img key={index} src={foto} alt={`Foto ${index + 1}`} className="w-40 h-40 object-cover rounded-lg shadow-md" />
               ))}
             </div>
           </div>
@@ -215,18 +157,22 @@ function DetallesDepartamento() {
 
         {/* Subir nuevas imágenes */}
         <div className="mb-4">
-          <label className="block mb-1 text-gray-700">Subir Nuevas Fotos (JPG)</label>
+          <label className="block text-gray-700 font-medium mb-1">Subir Nuevas Fotos (JPG)</label>
           <input
             type="file"
             accept="image/jpeg"
             multiple
             onChange={handleFileChange}
-            className="w-full border rounded p-2 bg-white text-gray-900"
+            className="w-full border border-[#7F6DF2] rounded-lg p-3 focus:ring-2 focus:ring-[#9D1DF2] outline-none"
           />
         </div>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded w-full">
-          Actualizar
+        <button
+          type="submit"
+          className="w-full bg-[#D813F2] text-white py-3 px-6 rounded-lg hover:bg-[#9D1DF2] transition duration-300 text-lg font-semibold"
+          disabled={isLoading}
+        >
+          {isLoading ? "Actualizando..." : "Actualizar"}
         </button>
       </form>
     </div>
