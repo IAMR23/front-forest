@@ -5,7 +5,6 @@ import { jwtDecode } from "jwt-decode";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import PropertyDetail from "./pages/PropertyDetail";
 import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
 import LoginForm from "./components/LoginForm";
@@ -44,7 +43,6 @@ function App() {
         <main className="flex-grow w-full p-4">
           <Routes>
             <Route path="/home" element={<Home />} />
-            <Route path="/propiedad/:id" element={<PropertyDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
             {/* 🔹 Pasamos setAuth a LoginForm para actualizar estado tras login */}
